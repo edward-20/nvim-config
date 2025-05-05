@@ -1,4 +1,64 @@
 return {
+  {
+    "williamboman/mason.nvim", -- GitHub user/repo
+    build = ":MasonUpdate",     -- Run this command after install/update
+    config = function()
+      require("mason").setup()
+    end,
+    opts = {
+      ensure_installed = {
+        "stylua",
+        "shellcheck",
+        "shfmt",
+        "flake8",
+      },
+    },
+    lazy = false,               -- Load during startup (eagerly)
+    priority = 1000             -- Load this early (important if other plugins depend on it)
+  },
+  {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = { "mason.nvim", "nvim-cmp" },
+    config = function()
+      require("mason-lspconfig").setup({
+        ensure_installed = { "clangd", "tsserver", "emmet_ls" }
+      })
+      require("mason-lspconfig").setup_handlers({
+        function(server_name)
+          require("lspconfig")[server_name].setup({
+            capabilities = require('cmp_nvim_lsp').default_capabilities()
+          })
+        end,
+        ["emmet_ls"] = function()
+          require("lspconfig").emmet_ls.setup({
+            filetypes = { 'html', 'css', 'javascriptreact', 'typescriptreact', 'svelte', 'vue' },
+          })
+        end
+      })
+      -- require("lspconfig").clangd.setup({
+      --   -- cmd = { "clangd", "--background-index"}
+      --   -- filetypes = { "c", "cpp" }
+      --   -- root_dir = require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt", ".git")
+      --   -- capabilities = require("cmp_nvim_lsp").default_capabilities()
+      --   -- init_options = {
+      --   --   fallbackFlags = { "--std=c23" }
+      --   -- }
+
+      --   -- a function that runs when the language server attaches to a buffer (typically used to setup buffer-local keybindings)
+      --   -- on_attach = function(client, bufnr)
+      --     -- client.server_capabilities.signatureHelpProvider = false
+      --     -- on_attach(client, bufnr)
+      --   -- end
+      --   capabilities = require('cmp_nvim_lsp').default_capabilities()
+      -- })
+      -- require("lspconfig").ts_ls.setup({
+      --   capabilities = require('cmp_nvim_lsp').default_capabilities()
+      -- })
+      -- require("lspconfig").emmet_ls.setup({
+      --   filetypes = { 'html', 'css', 'javascriptreact', 'typescriptreact', 'svelte', 'vue' },
+      -- })
+    end
+  },
   -- the colorscheme should be available when starting Neovim
   {
     "folke/tokyonight.nvim",
@@ -118,30 +178,6 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    config = function()
-      require("lspconfig").clangd.setup({
-        -- cmd = { "clangd", "--background-index"}
-        -- filetypes = { "c", "cpp" }
-        -- root_dir = require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt", ".git")
-        -- capabilities = require("cmp_nvim_lsp").default_capabilities()
-        -- init_options = {
-        --   fallbackFlags = { "--std=c23" }
-        -- }
-
-        -- a function that runs when the language server attaches to a buffer (typically used to setup buffer-local keybindings)
-        -- on_attach = function(client, bufnr)
-          -- client.server_capabilities.signatureHelpProvider = false
-          -- on_attach(client, bufnr)
-        -- end
-        capabilities = require('cmp_nvim_lsp').default_capabilities()
-      })
-      require("lspconfig").ts_ls.setup({
-        capabilities = require('cmp_nvim_lsp').default_capabilities()
-      })
-      require("lspconfig").emmet_ls.setup({
-        filetypes = { 'html', 'css', 'javascriptreact', 'typescriptreact', 'svelte', 'vue' },
-      })
-    end
   },
   {
     "hrsh7th/nvim-cmp",
