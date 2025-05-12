@@ -22,12 +22,16 @@ return {
     dependencies = { "mason.nvim", "nvim-cmp" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "clangd", "tsserver", "emmet_ls" }
+        ensure_installed = { "clangd", "ts_ls", "emmet_ls" }
       })
       require("mason-lspconfig").setup_handlers({
         function(server_name)
           require("lspconfig")[server_name].setup({
-            capabilities = require('cmp_nvim_lsp').default_capabilities()
+            capabilities = require('cmp_nvim_lsp').default_capabilities();
+            on_attach = function(_, bufnr)
+              local opts = { buffer = bufnr, desc = "Go to definition" }
+              vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+            end
           })
         end,
         ["emmet_ls"] = function()
@@ -75,6 +79,7 @@ return {
         type = "executable",
         command = vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/adapter/codelldb",
       }
+      dap.set_log_level("TRACE")
     end
   },
   {
