@@ -1,4 +1,5 @@
 return {
+  -- pkg manager for LSP Servers, linters, formatters and debuggers
   {
     "williamboman/mason.nvim", -- GitHub user/repo
     build = ":MasonUpdate",     -- Run this command after install/update
@@ -17,20 +18,23 @@ return {
     lazy = false,               -- Load during startup (eagerly)
     priority = 1000             -- Load this early (important if other plugins depend on it)
   },
+  -- bridges mason.nvim with lspconfig
   {
     "williamboman/mason-lspconfig.nvim",
     dependencies = { "mason.nvim", "nvim-cmp" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "clangd", "ts_ls", "emmet_ls" }
+        ensure_installed = { "clangd", "ts_ls", "emmet_ls", "hls" }
       })
       require("mason-lspconfig").setup_handlers({
         function(server_name)
           require("lspconfig")[server_name].setup({
             capabilities = require('cmp_nvim_lsp').default_capabilities();
             on_attach = function(_, bufnr)
-              local opts = { buffer = bufnr, desc = "Go to definition" }
+              local opts = { buffer = bufnr, desc = "Go to definition/references" }
               vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+              vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+              vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
             end
           })
         end,
@@ -64,7 +68,8 @@ return {
       -- })
     end
   },
-  -- lazydev.nvim used to help with lua language server for configuration of neovim
+  -- lazydev.nvim used to help configuring lua language server for editing
+  -- neovim config
   {
     "folke/lazydev.nvim",
     ft = "lua", -- only load on lua files
@@ -144,17 +149,21 @@ return {
       vim.cmd([[colorscheme tokyonight]])
     end,
   },
+  -- fuzzy finder
   {
     'nvim-telescope/telescope.nvim', tag = '0.1.8',
     dependencies = { 'nvim-lua/plenary.nvim', 'BurntSushi/ripgrep' }
   },
+  -- neovim statusline
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' }
   },
+  -- adjust shiftwidth and expandtab heuristically based on the file
   {
     'tpope/vim-sleuth'
   },
+  -- 
   {
     "nvim-treesitter/nvim-treesitter",
     config = function()
@@ -244,6 +253,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter-textobjects"
   },
+  -- pairs characters
   {
     'windwp/nvim-autopairs',
     event = "InsertEnter",
@@ -251,6 +261,7 @@ return {
     -- use opts = {} for passing setup options
     -- this is equivalent to setup({}) function
   },
+  -- gives good configs for lsp clients
   {
     "neovim/nvim-lspconfig",
   },
