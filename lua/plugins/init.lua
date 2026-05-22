@@ -65,7 +65,13 @@ return {
             ['<C-n>'] = cmp.mapping.scroll_docs(4),
             ['<C-space>'] = cmp.mapping.complete(),
             ['<C-b>'] = cmp.mapping.select_prev_item(),
-            ['<C-f>'] = cmp.mapping.select_next_item(),
+            ['<Tab>'] = cmp.mapping(function(fallback)
+				if cmp.visible() then
+					cmp.select_next_item()
+				else
+					fallback()
+				end
+			end, { 'i', 's'}),
             ['<C-e>'] = cmp.mapping.abort(),
             ['<CR>'] = cmp.mapping.confirm({ select = true }),
         }),
